@@ -6,153 +6,162 @@
     <title>Face and Iris Landmarks</title>
     <style>
       body {
-        margin: 0;
-        padding: 0;
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(to bottom, #6a11cb, #2575fc);
-        color: white;
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        justify-content: flex-start;
-        min-height: 100vh;
-      }
-
-      header {
-        width: 100%;
-        text-align: center;
-        padding: 20px 0;
-        background: rgba(0, 0, 0, 0.2);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      header h1 {
+        height: 100vh;
         margin: 0;
-        font-size: 24px;
-      }
-
-      #instructions {
-        margin-top: 10px;
-        font-size: 16px;
-        opacity: 0.8;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
       }
 
       #container {
         position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 640px;
         height: 480px;
-        margin: 20px auto;
-        border: 2px solid white;
-        border-radius: 10px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background: #000;
         overflow: hidden;
-        background: black;
       }
 
-      video,
+      video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 640px;
+        height: 480px;
+        z-index: 1;
+        border: 5px solid black; /* Fixed border property */
+        border-radius: 10px; /* Keeps a subtle rounded look */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for a sleek effect */
+      }
+
       canvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 640px;
+        height: 480px;
+        z-index: 2;
       }
 
-      #warning-overlay {
-        position: absolute;
+      /* Alert overlay styles */
+      .alert-overlay {
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 0, 0, 0.7);
-        color: white;
-        display: none;
-        align-items: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
         justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px);
+        transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+      }
+
+      .alert-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .alert-box {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        color: white;
+        padding: 30px 40px;
+        border-radius: 12px;
         text-align: center;
-        font-size: 20px;
-        z-index: 3;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+        transform: scale(0.9);
+        animation: alertPulse 0.6s ease infinite alternate;
       }
 
-      #loading {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 20px;
-        color: white;
-        z-index: 4;
+      .alert-box h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
       }
 
-      #controls {
-        margin-top: 20px;
+      .alert-box p {
+        font-size: 18px;
+        margin-bottom: 20px;
+        line-height: 1.5;
       }
 
-      .button {
-        padding: 10px 20px;
-        margin: 0 10px;
-        font-size: 16px;
+      .alert-box button {
+        background-color: #fff;
+        color: #ff4b2b;
         border: none;
-        border-radius: 5px;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
         cursor: pointer;
+        transition: all 0.3s ease;
       }
 
-      .button-primary {
-        background: #28a745;
-        color: white;
+      .alert-box button:hover {
+        background-color: #f2f2f2;
+        color: #ff416c;
       }
 
-      .button-primary:hover {
-        background: #218838;
-      }
-
-      .button-secondary {
-        background: #ffc107;
-        color: white;
-      }
-
-      .button-secondary:hover {
-        background: #e0a800;
+      /* Pulse animation for the alert */
+      @keyframes alertPulse {
+        from {
+          transform: scale(0.95);
+        }
+        to {
+          transform: scale(1);
+        }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Face and Iris Landmark Detection</h1>
-      <p id="instructions">
-        Please ensure your face is visible to the camera and look straight at
-        the screen.
-      </p>
-    </header>
-
     <div id="container">
       <video id="video" autoplay muted></video>
       <canvas id="output"></canvas>
-      <div id="warning-overlay"></div>
-      <div id="loading">Loading...</div>
     </div>
 
-    <div id="controls">
-      <button class="button button-primary" onclick="resetWarnings()">
-        Reset Alerts
-      </button>
+    <!-- Alert Overlay -->
+    <div id="alertOverlay" class="alert-overlay">
+      <div class="alert-box">
+        <h2 id="alertTitle">Warning!</h2>
+        <p id="alertMessage">This is an alert message.</p>
+        <button onclick="closeAlert()">Close</button>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+
     <script>
       const VIDEO_WIDTH = 640;
       const VIDEO_HEIGHT = 480;
 
       let video, canvas, ctx, faceMesh;
-      let warnings = [];
-      let warningOverlay, loadingIndicator;
+      let leftEyeClosedTime = null;
+      let rightEyeClosedTime = null;
+      let totalEyeClosureTime = 0;
+      let faceAlertShown = false;
+      let eyeAlertShown = false;
 
-      // Initialize Camera
+      // Initialize the camera feed
       async function setupCamera() {
         video = document.getElementById("video");
+
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT },
         });
+
         video.srcObject = stream;
+
         return new Promise((resolve) => {
           video.onloadedmetadata = () => {
             video.play();
@@ -169,7 +178,7 @@
         });
 
         faceMesh.setOptions({
-          maxNumFaces: 1,
+          maxNumFaces: 2,
           refineLandmarks: true,
           minDetectionConfidence: 0.5,
           minTrackingConfidence: 0.5,
@@ -178,64 +187,110 @@
         faceMesh.onResults(onResults);
       }
 
-      function displayWarning(message) {
-        if (!warnings.includes(message)) {
-          warnings.push(message);
-          warningOverlay.style.display = "flex";
-          warningOverlay.innerHTML = `<p>${message}</p>`;
-          setTimeout(() => {
-            warningOverlay.style.display = "none";
-            warnings = warnings.filter((warning) => warning !== message);
-          }, 3000);
-        }
+      // Show alert
+      function showAlert(title, message) {
+        const alertOverlay = document.getElementById("alertOverlay");
+        const alertTitle = document.getElementById("alertTitle");
+        const alertMessage = document.getElementById("alertMessage");
+
+        alertTitle.textContent = title;
+        alertMessage.textContent = message;
+
+        alertOverlay.classList.add("show");
       }
 
-      function resetWarnings() {
-        warnings = [];
-        warningOverlay.style.display = "none";
+      // Close alert
+      function closeAlert() {
+        const alertOverlay = document.getElementById("alertOverlay");
+        alertOverlay.classList.remove("show");
       }
 
+      // Process results and analyze
       function onResults(results) {
         ctx.clearRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+
         const faces = results.multiFaceLandmarks;
+
+        // Alert for multiple faces
+        if (faces && faces.length > 1 && !faceAlertShown) {
+          showAlert(
+            "Warning!",
+            "No third person should be in front of the screen."
+          );
+          faceAlertShown = true;
+          setTimeout(() => (faceAlertShown = false), 5000);
+          return;
+        }
 
         if (faces) {
           for (const landmarks of faces) {
-            drawLandmarks(landmarks, "red");
+            monitorFaceDirection(landmarks);
+            monitorEyeClosure(landmarks);
           }
         }
-
-        loadingIndicator.style.display = "none"; // Hide loading indicator after detection starts
       }
 
-      function drawLandmarks(landmarks, color) {
-        ctx.fillStyle = color;
-        landmarks.forEach((landmark) => {
-          const x = landmark.x * VIDEO_WIDTH;
-          const y = landmark.y * VIDEO_HEIGHT;
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, 2 * Math.PI);
-          ctx.fill();
-        });
+      // Monitor face direction
+      function monitorFaceDirection(landmarks) {
+        const noseBase = landmarks[168];
+        const faceCenterX = noseBase.x * VIDEO_WIDTH;
+
+        if (
+          (faceCenterX < VIDEO_WIDTH * 0.3 ||
+            faceCenterX > VIDEO_WIDTH * 0.7) &&
+          !faceAlertShown
+        ) {
+          showAlert("Warning!", "Please look at the screen.");
+          faceAlertShown = true;
+          setTimeout(() => (faceAlertShown = false), 5000);
+        }
       }
 
+      // Monitor eye closure
+      function monitorEyeClosure(landmarks) {
+        const leftEyeLandmarks = [159, 145];
+        const rightEyeLandmarks = [386, 374];
+
+        const leftEyeOpen =
+          Math.abs(
+            landmarks[leftEyeLandmarks[0]].y - landmarks[leftEyeLandmarks[1]].y
+          ) > 0.01;
+        const rightEyeOpen =
+          Math.abs(
+            landmarks[rightEyeLandmarks[0]].y -
+              landmarks[rightEyeLandmarks[1]].y
+          ) > 0.01;
+
+        const currentTime = performance.now();
+
+        if (!leftEyeOpen && !rightEyeOpen) {
+          if (leftEyeClosedTime === null) {
+            leftEyeClosedTime = currentTime;
+          }
+          totalEyeClosureTime += (currentTime - leftEyeClosedTime) / 1000;
+        } else {
+          leftEyeClosedTime = null;
+          totalEyeClosureTime = 0;
+        }
+
+        if (totalEyeClosureTime > 3 && !eyeAlertShown) {
+          showAlert("Warning!", "Please open your eyes.");
+          eyeAlertShown = true;
+          setTimeout(() => (eyeAlertShown = false), 5000);
+        }
+      }
+
+      // Main function
       async function main() {
-        loadingIndicator = document.getElementById("loading");
-        warningOverlay = document.getElementById("warning-overlay");
-
         await setupCamera();
+
         canvas = document.getElementById("output");
         ctx = canvas.getContext("2d");
+
         canvas.width = VIDEO_WIDTH;
         canvas.height = VIDEO_HEIGHT;
 
         initializeFaceMesh();
-        detectFaces();
-      }
-
-      async function detectFaces() {
-        await faceMesh.send({ image: video });
-        requestAnimationFrame(detectFaces);
       }
 
       main();
