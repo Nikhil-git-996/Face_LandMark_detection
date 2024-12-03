@@ -101,7 +101,7 @@
 
         // Alert for multiple faces
         if (faces && faces.length > 1) {
-            displayWarning("Multiple faces detected. Only one person should be in front of the screen.");
+            alert("Multiple faces detected. Only one person should be in front of the screen.");
             return;
         }
 
@@ -137,7 +137,7 @@
         const faceCenterX = noseBase.x * VIDEO_WIDTH;
 
         if (faceCenterX < VIDEO_WIDTH * 0.3 || faceCenterX > VIDEO_WIDTH * 0.7) {
-            displayWarning("Face not centered. Please look at the screen.");
+            alert("Face not centered. Please look at the screen.");
         }
     }
 
@@ -164,7 +164,7 @@
         }
 
         if (totalEyeClosureTime > 3 && !alertShown) {
-            displayWarning("Eyes closed for too long. Please stay alert.");
+            alert("Eyes closed for too long. Please stay alert.");
             alertShown = true;
         } else {
             alertShown = false;
