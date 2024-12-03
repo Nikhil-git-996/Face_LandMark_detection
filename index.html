@@ -1,299 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face and Iris Landmarks</title>
     <style>
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-        font-family: Arial, sans-serif;
-      }
-
-      #container {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 640px;
-        height: 480px;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        background: #000;
-        overflow: hidden;
-      }
-
-      video {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 640px;
-        height: 480px;
-        z-index: 1;
-        border: 5px solid black; /* Fixed border property */
-        border-radius: 10px; /* Keeps a subtle rounded look */
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for a sleek effect */
-      }
-
-      canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 640px;
-        height: 480px;
-        z-index: 2;
-      }
-
-      /* Alert overlay styles */
-      .alert-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-20px);
-        transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
-      }
-
-      .alert-overlay.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      .alert-box {
-        background: linear-gradient(135deg, #ff416c, #ff4b2b);
-        color: white;
-        padding: 30px 40px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
-        transform: scale(0.9);
-        animation: alertPulse 0.6s ease infinite alternate;
-      }
-
-      .alert-box h2 {
-        font-size: 24px;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
-
-      .alert-box p {
-        font-size: 18px;
-        margin-bottom: 20px;
-        line-height: 1.5;
-      }
-
-      .alert-box button {
-        background-color: #fff;
-        color: #ff4b2b;
-        border: none;
-        border-radius: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .alert-box button:hover {
-        background-color: #f2f2f2;
-        color: #ff416c;
-      }
-
-      /* Pulse animation for the alert */
-      @keyframes alertPulse {
-        from {
-          transform: scale(0.95);
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
-        to {
-          transform: scale(1);
+
+        #container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 640px;
+            height: 480px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background: #000;
+            overflow: hidden;
         }
-      }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 640px;
+            height: 480px;
+            z-index: 1;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 640px;
+            height: 480px;
+            z-index: 2;
+        }
+
+        /* Alert overlay styles */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+        }
+
+        .alert-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .alert-box {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            animation: alertPulse 0.6s ease infinite alternate;
+        }
+
+        .alert-box h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .alert-box p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .alert-box button {
+            background-color: #fff;
+            color: #ff4b2b;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .alert-box button:hover {
+            background-color: #f2f2f2;
+            color: #ff416c;
+        }
+
+        /* Pulse animation for the alert */
+        @keyframes alertPulse {
+            from {
+                transform: scale(0.95);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div id="container">
-      <video id="video" autoplay muted></video>
-      <canvas id="output"></canvas>
+        <video id="video" autoplay muted></video>
+        <canvas id="output"></canvas>
     </div>
 
     <!-- Alert Overlay -->
     <div id="alertOverlay" class="alert-overlay">
-      <div class="alert-box">
-        <h2 id="alertTitle">Warning!</h2>
-        <p id="alertMessage">This is an alert message.</p>
-        <button onclick="closeAlert()">Close</button>
-      </div>
+        <div class="alert-box">
+            <h2 id="alertTitle">Warning!</h2>
+            <p id="alertMessage">This is an alert message.</p>
+            <button onclick="closeAlert()">Close</button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
 
     <script>
-      const VIDEO_WIDTH = 640;
-      const VIDEO_HEIGHT = 480;
+        const VIDEO_WIDTH = 640;
+        const VIDEO_HEIGHT = 480;
 
-      let video, canvas, ctx, faceMesh;
-      let leftEyeClosedTime = null;
-      let rightEyeClosedTime = null;
-      let totalEyeClosureTime = 0;
-      let faceAlertShown = false;
-      let eyeAlertShown = false;
+        let video, canvas, ctx, faceMesh;
+        let leftEyeClosedTime = null;
+        let rightEyeClosedTime = null;
+        let totalEyeClosureTime = 0;
+        let faceAlertShown = false;
+        let eyeAlertShown = false;
 
-      // Initialize the camera feed
-      async function setupCamera() {
-        video = document.getElementById("video");
+        // Initialize the camera feed
+        async function setupCamera() {
+            video = document.getElementById('video');
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT },
-        });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT }
+            });
 
-        video.srcObject = stream;
+            video.srcObject = stream;
 
-        return new Promise((resolve) => {
-          video.onloadedmetadata = () => {
-            video.play();
-            resolve(video);
-          };
-        });
-      }
-
-      // Initialize MediaPipe FaceMesh
-      function initializeFaceMesh() {
-        faceMesh = new FaceMesh({
-          locateFile: (file) =>
-            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
-        });
-
-        faceMesh.setOptions({
-          maxNumFaces: 2,
-          refineLandmarks: true,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5,
-        });
-
-        faceMesh.onResults(onResults);
-      }
-
-      // Show alert
-      function showAlert(title, message) {
-        const alertOverlay = document.getElementById("alertOverlay");
-        const alertTitle = document.getElementById("alertTitle");
-        const alertMessage = document.getElementById("alertMessage");
-
-        alertTitle.textContent = title;
-        alertMessage.textContent = message;
-
-        alertOverlay.classList.add("show");
-      }
-
-      // Close alert
-      function closeAlert() {
-        const alertOverlay = document.getElementById("alertOverlay");
-        alertOverlay.classList.remove("show");
-      }
-
-      // Process results and analyze
-      function onResults(results) {
-        ctx.clearRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
-
-        const faces = results.multiFaceLandmarks;
-
-        // Alert for multiple faces
-        if (faces && faces.length > 1 && !faceAlertShown) {
-          showAlert(
-            "Warning!",
-            "No third person should be in front of the screen."
-          );
-          faceAlertShown = true;
-          setTimeout(() => (faceAlertShown = false), 5000);
-          return;
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resolve(video);
+                };
+            });
         }
 
-        if (faces) {
-          for (const landmarks of faces) {
-            monitorFaceDirection(landmarks);
-            monitorEyeClosure(landmarks);
-          }
-        }
-      }
+        // Initialize MediaPipe FaceMesh
+        function initializeFaceMesh() {
+            faceMesh = new FaceMesh({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+            });
 
-      // Monitor face direction
-      function monitorFaceDirection(landmarks) {
-        const noseBase = landmarks[168];
-        const faceCenterX = noseBase.x * VIDEO_WIDTH;
+            faceMesh.setOptions({
+                maxNumFaces: 2,
+                refineLandmarks: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
 
-        if (
-          (faceCenterX < VIDEO_WIDTH * 0.3 ||
-            faceCenterX > VIDEO_WIDTH * 0.7) &&
-          !faceAlertShown
-        ) {
-          showAlert("Warning!", "Please look at the screen.");
-          faceAlertShown = true;
-          setTimeout(() => (faceAlertShown = false), 5000);
-        }
-      }
-
-      // Monitor eye closure
-      function monitorEyeClosure(landmarks) {
-        const leftEyeLandmarks = [159, 145];
-        const rightEyeLandmarks = [386, 374];
-
-        const leftEyeOpen =
-          Math.abs(
-            landmarks[leftEyeLandmarks[0]].y - landmarks[leftEyeLandmarks[1]].y
-          ) > 0.01;
-        const rightEyeOpen =
-          Math.abs(
-            landmarks[rightEyeLandmarks[0]].y -
-              landmarks[rightEyeLandmarks[1]].y
-          ) > 0.01;
-
-        const currentTime = performance.now();
-
-        if (!leftEyeOpen && !rightEyeOpen) {
-          if (leftEyeClosedTime === null) {
-            leftEyeClosedTime = currentTime;
-          }
-          totalEyeClosureTime += (currentTime - leftEyeClosedTime) / 1000;
-        } else {
-          leftEyeClosedTime = null;
-          totalEyeClosureTime = 0;
+            faceMesh.onResults(onResults);
         }
 
-        if (totalEyeClosureTime > 3 && !eyeAlertShown) {
-          showAlert("Warning!", "Please open your eyes.");
-          eyeAlertShown = true;
-          setTimeout(() => (eyeAlertShown = false), 5000);
+        // Show alert
+        function showAlert(title, message) {
+            const alertOverlay = document.getElementById('alertOverlay');
+            const alertTitle = document.getElementById('alertTitle');
+            const alertMessage = document.getElementById('alertMessage');
+
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+
+            alertOverlay.classList.add('show');
         }
-      }
 
-      // Main function
-      async function main() {
-        await setupCamera();
+        // Close alert
+        function closeAlert() {
+            const alertOverlay = document.getElementById('alertOverlay');
+            alertOverlay.classList.remove('show');
+        }
 
-        canvas = document.getElementById("output");
-        ctx = canvas.getContext("2d");
+        // Process results and analyze
+        function onResults(results) {
+            ctx.clearRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
 
-        canvas.width = VIDEO_WIDTH;
-        canvas.height = VIDEO_HEIGHT;
+            const faces = results.multiFaceLandmarks;
 
-        initializeFaceMesh();
-      }
+            // Alert for multiple faces
+            if (faces && faces.length > 1 && !faceAlertShown) {
+                showAlert("Warning!", "No third person should be in front of the screen.");
+                faceAlertShown = true;
+                setTimeout(() => (faceAlertShown = false), 5000);
+                return;
+            }
 
-      main();
+            if (faces) {
+                for (const landmarks of faces) {
+                    monitorFaceDirection(landmarks);
+                    monitorEyeClosure(landmarks);
+                }
+            }
+        }
+
+        // Monitor face direction
+        function monitorFaceDirection(landmarks) {
+            const noseBase = landmarks[168];
+            const faceCenterX = noseBase.x * VIDEO_WIDTH;
+
+            if ((faceCenterX < VIDEO_WIDTH * 0.3 || faceCenterX > VIDEO_WIDTH * 0.7) && !faceAlertShown) {
+                showAlert("Warning!", "Please look at the screen.");
+                faceAlertShown = true;
+                setTimeout(() => (faceAlertShown = false), 5000);
+            }
+        }
+
+        // Monitor eye closure
+        function monitorEyeClosure(landmarks) {
+            const leftEyeLandmarks = [159, 145];
+            const rightEyeLandmarks = [386, 374];
+
+            const leftEyeOpen = Math.abs(landmarks[leftEyeLandmarks[0]].y - landmarks[leftEyeLandmarks[1]].y) > 0.01;
+            const rightEyeOpen = Math.abs(landmarks[rightEyeLandmarks[0]].y - landmarks[rightEyeLandmarks[1]].y) > 0.01;
+
+            const currentTime = performance.now();
+
+            if (!leftEyeOpen && !rightEyeOpen) {
+                if (leftEyeClosedTime === null) {
+                    leftEyeClosedTime = currentTime;
+                }
+                totalEyeClosureTime += (currentTime - leftEyeClosedTime) / 1000;
+            } else {
+                leftEyeClosedTime = null;
+                totalEyeClosureTime = 0;
+            }
+
+            if (totalEyeClosureTime > 3 && !eyeAlertShown) {
+                showAlert("Warning!", "Please open your eyes.");
+                eyeAlertShown = true;
+                setTimeout(() => (eyeAlertShown = false), 5000);
+            }
+        }
+
+        // Main function
+        async function main() {
+            await setupCamera();
+
+            canvas = document.getElementById('output');
+            ctx = canvas.getContext('2d');
+
+            canvas.width = VIDEO_WIDTH;
+            canvas.height = VIDEO_HEIGHT;
+
+            initializeFaceMesh();
+        }
+
+        main();
     </script>
-  </body>
+</body>
 </html>
