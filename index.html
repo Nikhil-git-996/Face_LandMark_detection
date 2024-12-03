@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face and Iris Landmarks</title>
+    <style>
+        body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0; /* Optional: to make the background look better */
+}
+
+#container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 640px;
+    height: 480px;
+}
+
+video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 640px;
+    height: 480px;
+    z-index: 1;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 640px;
+    height: 480px;
+    z-index: 2;
+}
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <video id="video" autoplay muted></video>
+        <canvas id="output"></canvas>
+    </div>
+
+    <!-- Load MediaPipe FaceMesh -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+
+    <!-- JavaScript -->
+    <script src="faceLandmarkDetection.js"></script>
+    <script src="processEyes.js"></script>
+</body>
+</html>
